@@ -1,0 +1,99 @@
+#!/bin/sh
+#
+# make install or pkg_add script
+# Checks labels/gptids for roots and swap partitions
+# adds hyperv labels in loader.conf 
+#
+
+if [ "$2" = "PRE-INSTALL" ]; then
+echo "===> Pre-install Check"
+
+#rootfs check
+root_flag=$(mount | awk '/ on \/ / { print $1 }' | cut -d / -f3-)
+if [ "$root_flag" != "" ]; then
+   fs_test=$(glabel status | awk '{print $1}' | grep $root_flag)
+   if [ "$fs_test" == "" ]; then
+      echo " xxx rootfs Label/gptid missing in fstab"  
+   fi
+else 
+   echo " xxx rootfs Label/gptid missing in fstab"
+fi
+
+#swap check
+swap_flag=$(grep swap /etc/fstab | awk '{print $1}' | cut -d / -f3-)
+if [ "$swap_flag" != "" ]; then
+   sw_test=$(glabel status | awk '{print $1}' | grep $swap_flag)
+   if [ "$sw_test" == "" ]; then
+      echo " xxx swap Label/gptid missing in fstab"  
+   fi
+else   
+   echo " xxx swap Label/gptid missing in fstab "
+fi
+
+if [ "$fs_test" != "" -a  "$sw_test" != "" ]; then
+   echo "===> Labels/gptids Found"
+   echo "===> Hyper-V Installation Continues"
+   else
+   echo "===> Labels/gptids Not found"
+   echo "===> Hyper-V Installation Aborted"
+   echo "===> Refer to Disk UUID section in README document"
+   exit -1 
+fi
+
+# KVP - Directories Check
+
+echo "===> Checking KVP directories" 
+kvp_dir="/etc/hyperv/"
+kvp_dir_scripts="/etc/hyperv/scripts"
+
+if [ -d $kvp_dir ]; then
+   if [ -d $kvp_dir_scripts ]; then
+      echo " ### KVP Directories present " 
+   else 
+      echo " ### Creating $kvp_dir_scripts directory "
+      mkdir /etc/hyperv/scripts
+   fi
+else 
+   echo " xxx KVP directories not found"
+   echo " ### Creating KVP  directories "
+   mkdir /etc/hyperv
+   mkdir /etc/hyperv/scripts
+fi
+
+else if [ "$2" = "POST-INSTALL" ]; then
+   test="/boot/loader.conf"
+
+   if [ -f $test ]; then
+      echo "===> File $test exists"
+      echo "Adding for Hyper-v drivers"
+
+      # Deleting hyperv driver names
+      sed -i".bak" '/Loader labels for Hyper-V driver/d' /boot/loader.conf
+      sed -i".bak" '/hv_vmbus_load/d' /boot/loader.conf
+      sed -i".bak" '/hv_utils_load/d' /boot/loader.conf
+      sed -i".bak" '/hv_storvsc_load/d' /boot/loader.conf
+      sed -i".bak" '/hv_netvsc_load/d' /boot/loader.conf
+      sed -i".bak" '/hv_ata_pci_disengage_load/d' /boot/loader.conf
+
+      #hyperv driver names
+      echo  "# Loader labels for Hyper-V drivers -do not modify" >> /boot/loader.conf
+      echo  "hv_vmbus_load=\"YES\"" >> /boot/loader.conf
+      echo  "hv_utils_load=\"YES\""  >> /boot/loader.conf
+      echo  "hv_storvsc_load=\"YES\""  >> /boot/loader.conf
+      echo  "hv_netvsc_load=\"YES\""  >> /boot/loader.conf
+      echo  "hv_ata_pci_disengage_load=\"YES\""  >> /boot/loader.conf
+
+   else
+      echo "===> File $test does not exists"
+      echo " Adding File $test and Hyper-V driver labels"
+      #hyperv driver names
+      echo  "# Loader labels for Hyper-V drivers -do not modify" >> /boot/loader.conf
+      echo  "hv_vmbus_load=\"YES\"" >> /boot/loader.conf
+      echo  "hv_utils_load=\"YES\""  >> /boot/loader.conf
+      echo  "hv_storvsc_load=\"YES\""  >> /boot/loader.conf
+      echo  "hv_netvsc_load=\"YES\""  >> /boot/loader.conf
+      echo  "hv_ata_pci_disengage_load=\"YES\""  >> /boot/loader.conf
+   fi
+fi
+fi
+exit 0

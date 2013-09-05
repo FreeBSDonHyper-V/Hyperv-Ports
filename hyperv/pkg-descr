@@ -1,0 +1,23 @@
+Overview
+When installed in a FreeBSD virtual machine running on Hyper-V, the FreeBSD 
+Integration Components provide.
+
+Driver support: 
+FreeBSD Integration Services supports the network controller and the IDE and 
+SCSI storage controllers that were developed specifically for Hyper-V.
+
+Timesync: 
+The clock inside the virtual machine will intially sync with the clock on the 
+virtualization server in preparation for an external clock source
+
+Integrated Shutdown: 
+Virtual machines running FreeBSD can be shut down from either 
+Hyper-V Manager or System Center Virtual Machine Manager by using the 
+.Shut Down. command.
+
+Heartbeat: 
+Allows the virtualization server to detect whether the virtual machine is 
+running and responsive.
+
+
+WWW: http://freebsdonhyper-v.github.io/
