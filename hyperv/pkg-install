@@ -94,6 +94,14 @@ else if [ "$2" = "POST-INSTALL" ]; then
       echo  "hv_netvsc_load=\"YES\""  >> /boot/loader.conf
       echo  "hv_ata_pci_disengage_load=\"YES\""  >> /boot/loader.conf
    fi
+
+# KVP - daemon label
+echo "===> Adding kvp daemon label" 
+sed -i".bak" '/Labels for KVP daemon/d' /etc/rc.conf
+sed -i".bak" '/hv_kvp_daemon_enable/d' /etc/rc.conf
+echo  "# Labels for KVP daemon -do not modify" >> /etc/rc.conf
+echo  "hv_kvp_daemon_enable=\"YES\"" >> /etc/rc.conf
+
 fi
 fi
 exit 0

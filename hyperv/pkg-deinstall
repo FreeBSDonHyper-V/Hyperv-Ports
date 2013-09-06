@@ -20,5 +20,10 @@ if [ "$2" = "DEINSTALL" ]; then
    else 
    echo "===> File $test not found"
    fi
+
+echo "===> Removing kvp daemon label"
+sed -i".bak" '/Labels for KVP daemon/d' /etc/rc.conf
+sed -i".bak" '/hv_kvp_daemon_enable/d' /etc/rc.conf
+
 fi
 exit 0
