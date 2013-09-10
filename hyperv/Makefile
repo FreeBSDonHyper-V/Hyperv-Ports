@@ -10,7 +10,6 @@ COMMENT=	Hyper-V Drivers
 
 FETCH_ARGS=	-Fpr
 
-# Need to add check for FreeBSD 9.1 RELEASE Only
 CC=clang
 CXX=clang++
 CPP=clang-cpp

@@ -8,6 +8,18 @@
 if [ "$2" = "PRE-INSTALL" ]; then
 echo "===> Pre-install Check"
 
+<< COMMENT1
+# Check for version
+frebsd_verison=$(uname -r | awk '/9.1/{ print $1 }' | cut -d / -f3-)
+if [ "$frebsd_version" == "" ]; then
+   echo " XXX $version Only for FreeBSD 9.1"
+   exit -1
+else
+   echo " ==> FreeBSD $version"
+fi 
+COMMENT1
+
+
 #rootfs check
 root_flag=$(mount | awk '/ on \/ / { print $1 }' | cut -d / -f3-)
 if [ "$root_flag" != "" ]; then
@@ -43,21 +55,21 @@ fi
 # KVP - Directories Check
 
 echo "===> Checking KVP directories" 
-kvp_dir="/etc/hyperv/"
-kvp_dir_scripts="/etc/hyperv/scripts"
+kvp_dir="/usr/local/hyperv/"
+kvp_dir_scripts="/usr/local/hyperv/scripts"
 
 if [ -d $kvp_dir ]; then
    if [ -d $kvp_dir_scripts ]; then
       echo " ### KVP Directories present " 
    else 
       echo " ### Creating $kvp_dir_scripts directory "
-      mkdir /etc/hyperv/scripts
+      mkdir /usr/local/hyperv/scripts
    fi
 else 
    echo " xxx KVP directories not found"
    echo " ### Creating KVP  directories "
-   mkdir /etc/hyperv
-   mkdir /etc/hyperv/scripts
+   mkdir /usr/local/hyperv
+   mkdir /usr/local/hyperv/scripts
 fi
 
 else if [ "$2" = "POST-INSTALL" ]; then
