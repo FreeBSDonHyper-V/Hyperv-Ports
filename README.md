@@ -1,4 +1,4 @@
 Hyperv-Ports
 ============
 
-Repository for hyper port for FreeBSD 9.1 
+Repository for hyperv-tools port for FreeBSD 9.1 
