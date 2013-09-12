@@ -1,11 +1,11 @@
 # $FreeBSD$
 
-PORTNAME=	hyperv-tools
+PORTNAME=	hyperv-ic
 PORTVERSION=	1.0
 CATEGORIES=	kld
-MASTER_SITES=	https://github.com/FreeBSDonHyper-V/Hyperv-Ports/raw/packages/hyperv-tools/
+MASTER_SITES=	https://github.com/FreeBSDonHyper-V/Hyperv-Ports/raw/packages/hyperv-ic/
 
-MAINTAINER=	v-savar@microsoft.com
+MAINTAINER=	bsdic@microsoft.com
 COMMENT=	Hyper-V Drivers
 
 FETCH_ARGS=	-Fpr
