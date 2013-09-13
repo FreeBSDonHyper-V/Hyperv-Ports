@@ -1,23 +1,63 @@
-Overview
-When installed in a FreeBSD virtual machine running on Hyper-V, the FreeBSD 
-Integration Components provide.
+NAME
+     hyperv-ic -- Hyper-V Integration Components
 
-Driver support: 
-FreeBSD Integration Services supports the network controller and the IDE and 
-SCSI storage controllers that were developed specifically for Hyper-V.
-
-Timesync: 
-The clock inside the virtual machine will intially sync with the clock on the 
-virtualization server in preparation for an external clock source
-
-Integrated Shutdown: 
-Virtual machines running FreeBSD can be shut down from either 
-Hyper-V Manager or System Center Virtual Machine Manager by using the 
-.Shut Down. command.
-
-Heartbeat: 
-Allows the virtualization server to detect whether the virtual machine is 
-running and responsive.
+SYNOPSIS
+     The hyperv-ic provision a collection of kernel mode drivers and services
+     that enhance FreeBSD guest experience on Hyper-V.
 
 
-WWW: http://freebsdonhyper-v.github.io/
+DESCRIPTION
+     The Hyper-V Integration Components include drivers and services that
+     improve functionality and performance of a FreeBSD guest operating system
+     running on Hyper-V. As of this writing, the hyperv-ic ports package
+     installs the following binaries:
+
+     a) hv_vmbus.ko - This is a loadable kernel module that provides a high
+     performance communication interface between the FreeBSD guest partition
+     and the Hyper-V root partition running Windows Server software. This mod-
+     ule is located under /boot/kernel/.
+
+     b) hv_storvsc.ko - This is a loadable kernel module that provides FreeBSD
+     guests with optimized access to physical storage devices.  This module is
+     located under /boot/kernel/.
+
+     c) hv_netvsc.ko - This is a loadable kernel module that provides FreeBSD
+     guests with optimized access to the physical network card.  This module
+     is located under /boot/kernel/.
+
+     d) hv_utils.ko - This is a loadable kernel module that provides FreeBSD
+     guests with timekeeping, heartbeat, console shutdown and key-value pair
+     functionality. This module is located under /boot/kernel/.
+
+     e) hv_ata_pci_disengage.ko - This is a loadable kernel module that dis-
+     ables the FreeBSD native ATA driver in order to avoid conflicts with the
+     hv_storvsc driver. This module is located under /boot/kernel/.
+
+     f) hv_kvp_daemon - This is a user mode daemon that communicates with the
+     hv_utils driver to manage user configurable metadata in the form of key
+     value pairs.  This daemon also allows the system administrator to read
+     and set IP addresses assigned to a FreeBSD guest. The daemon utilizes the
+     following collection of scripts stored under /usr/local/hyperv/scripts:
+     hv_get_dhcp_info
+     hv_get_dns_info
+     hv_set_ifconfig
+
+     The daemon is located under /usr/sbin/. The corresponding daemon script
+     named hv_kvpd is present under /etc/rc.d/.
+
+PRE-REQUISITE
+     Before you install hyperv-ic ports, please ensure that you have added
+     disk labels or UUIDs to all devices listed in fstab.
+
+SEE ALSO
+     hv_vmbus(4), hv_utils(4), hv_netvsc(4), hv_storvsc(4),
+     hv_ata_pci_disengage(4), hv_kvp_daemon(8)
+
+HISTORY
+     Support for hyperv-ic ports was first released in September 2013. The
+     ports were developed through a joint effort between Citrix Inc.,
+     Microsoft Corp. and Network Appliance Inc..
+
+AUTHORS
+     FreeBSD support for hyperv-ic was first added by Microsoft BSD
+     Integration Services Team <bsdic@microsoft.com>.

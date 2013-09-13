@@ -6,7 +6,7 @@ CATEGORIES=	kld
 MASTER_SITES=	https://github.com/FreeBSDonHyper-V/Hyperv-Ports/raw/packages/hyperv-ic/
 
 MAINTAINER=	bsdic@microsoft.com
-COMMENT=	Hyper-V Drivers
+COMMENT=	Hyper-V Integration Components
 
 FETCH_ARGS=	-Fpr
 

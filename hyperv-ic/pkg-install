@@ -8,18 +8,6 @@
 if [ "$2" = "PRE-INSTALL" ]; then
 echo "===> Pre-install Check"
 
-<< COMMENT1
-# Check for version
-frebsd_verison=$(uname -r | awk '/9.1/{ print $1 }' | cut -d / -f3-)
-if [ "$frebsd_version" == "" ]; then
-   echo " XXX $version Only for FreeBSD 9.1"
-   exit -1
-else
-   echo " ==> FreeBSD $version"
-fi 
-COMMENT1
-
-
 #rootfs check
 root_flag=$(mount | awk '/ on \/ / { print $1 }' | cut -d / -f3-)
 if [ "$root_flag" != "" ]; then
@@ -49,6 +37,8 @@ if [ "$fs_test" != "" -a  "$sw_test" != "" ]; then
    echo "===> Labels/gptids Not found"
    echo "===> Hyper-V Installation Aborted"
    echo "===> Refer to Disk UUID section in README document"
+   echo "===> Please refer the Prerequisites page and complete all steps" 
+   echo "WWW: https://github.com/FreeBSDonHyper-V/Hyperv-Ports/wiki/Prerequisites " 
    exit -1 
 fi
 
