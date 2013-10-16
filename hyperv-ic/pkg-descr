@@ -5,7 +5,6 @@ SYNOPSIS
      The hyperv-ic provision a collection of kernel mode drivers and services
      that enhance FreeBSD guest experience on Hyper-V.
 
-
 DESCRIPTION
      The Hyper-V Integration Components include drivers and services that
      improve functionality and performance of a FreeBSD guest operating system
