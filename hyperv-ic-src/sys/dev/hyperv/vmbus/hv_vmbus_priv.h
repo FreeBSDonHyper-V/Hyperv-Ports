@@ -285,7 +285,7 @@ typedef union {
 	struct {
 		uint8_t	message_pending:1;
 		uint8_t	reserved:7;
-	};
+	} u;
 } hv_vmbus_msg_flags;
 
 typedef uint64_t hv_vmbus_partition_id;
@@ -393,7 +393,7 @@ typedef union {
 		 */
 		uint64_t os_id			: 8;
 		uint64_t vendor_id		: 16;
-	};
+	} u;
 } hv_vmbus_x64_msr_guest_os_id_contents;
 
 /*
@@ -407,7 +407,7 @@ typedef union {
 		uint64_t enable :1;
 		uint64_t reserved :11;
 		uint64_t guest_physical_address :52;
-	};
+	} u;
 } hv_vmbus_x64_msr_hypercall_contents;
 
 typedef union {
@@ -415,7 +415,7 @@ typedef union {
 	struct {
 		uint32_t group_enable :4;
 		uint32_t rsvd_z :28;
-	};
+	} u;
 } hv_vmbus_monitor_trigger_state;
 
 typedef union {
@@ -423,7 +423,7 @@ typedef union {
 	struct {
 		uint32_t pending;
 		uint32_t armed;
-	};
+	} u;
 } hv_vmbus_monitor_trigger_group;
 
 typedef struct {
@@ -499,7 +499,7 @@ typedef union {
 		uint64_t simp_enabled	: 1;
 		uint64_t preserved	: 11;
 		uint64_t base_simp_gpa	: 52;
-	};
+	} u;
 } hv_vmbus_synic_simp;
 
 /*
@@ -511,7 +511,7 @@ typedef union {
 		uint64_t siefp_enabled	: 1;
 		uint64_t preserved	: 11;
 		uint64_t base_siefp_gpa	: 52;
-	};
+	} u;
 } hv_vmbus_synic_siefp;
 
 /*
@@ -525,7 +525,7 @@ typedef union {
 		uint64_t masked		: 1;
 		uint64_t auto_eoi	: 1;
 		uint64_t reserved2	: 46;
-	};
+	} u;
 } hv_vmbus_synic_sint;
 
 /*
@@ -536,7 +536,7 @@ typedef union _hv_vmbus_synic_scontrol {
     struct {
         uint64_t enable		: 1;
         uint64_t reserved	: 63;
-    };
+    } u;
 } hv_vmbus_synic_scontrol;
 
 /*
@@ -716,7 +716,7 @@ static inline  uint64_t hv_generate_guest_id(
 
 typedef struct {
 	unsigned int	vector;
-	void		*pageBuffers[2];
+	void		*page_buffers[2];
 } hv_setup_args;
 
 #endif  /* __HYPERV_PRIV_H__ */
