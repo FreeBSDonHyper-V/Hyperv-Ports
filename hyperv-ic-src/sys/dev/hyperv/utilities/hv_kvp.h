@@ -184,16 +184,14 @@ struct hv_kvp_ipaddr_value {
 	uint16_t sub_net[MAX_IP_ADDR_SIZE];
 	uint16_t gate_way[MAX_GATEWAY_SIZE];
 	uint16_t dns_addr[MAX_IP_ADDR_SIZE];
-}
-__attribute__((packed));
+}__attribute__((packed));
 
 
 struct hv_kvp_hdr {
 	uint8_t  operation;
 	uint8_t  pool;
 	uint16_t pad;
-}
-__attribute__((packed));
+} __attribute__((packed));
 
 struct hv_kvp_exchg_msg_value {
 	uint32_t value_type;
@@ -204,26 +202,21 @@ struct hv_kvp_exchg_msg_value {
 		uint8_t  value[HV_KVP_EXCHANGE_MAX_VALUE_SIZE];
 		uint32_t value_u32;
 		uint64_t value_u64;
-	}
-		 msg_value;
-}
-__attribute__((packed));
+	} msg_value;
+} __attribute__((packed));
 
 struct hv_kvp_msg_enumerate {
-	uint32_t                      index;
+	uint32_t index;
 	struct hv_kvp_exchg_msg_value data;
-}
-__attribute__((packed));
+} __attribute__((packed));
 
 struct hv_kvp_msg_get {
 	struct hv_kvp_exchg_msg_value data;
-}
-__attribute__((packed));
+} __attribute__((packed));
 
 struct hv_kvp_msg_set {
 	struct hv_kvp_exchg_msg_value data;
-}
-__attribute__((packed));
+} __attribute__((packed));
 
 struct hv_kvp_msg_delete {
 	uint32_t key_size;
@@ -233,15 +226,13 @@ __attribute__((packed));
 
 struct hv_kvp_register {
 	uint8_t version[HV_KVP_EXCHANGE_MAX_KEY_SIZE];
-}
-__attribute__((packed));
+} __attribute__((packed));
 
 struct hv_kvp_msg {
 	union {
-		struct hv_kvp_hdr kvp_hdr;
-		int               error;
-	}
-	hdr;
+		struct hv_kvp_hdr	kvp_hdr;
+		int error;
+	} hdr;
 	union {
 		struct hv_kvp_msg_get       kvp_get;
 		struct hv_kvp_msg_set       kvp_set;
@@ -258,8 +249,7 @@ struct hv_kvp_ip_msg {
 	uint8_t                    operation;
 	uint8_t                    pool;
 	struct hv_kvp_ipaddr_value kvp_ip_val;
-}
-__attribute__((packed));
+}__attribute__((packed));
 
 #define BSD_SOC_PATH                "/usr/local/hyperv/hyperv_socket"
 
@@ -292,7 +282,7 @@ typedef struct hv_vmbus_service {
 	void (*callback)(void *);
 } hv_vmbus_service;
 
-extern uint8_t          *receive_buffer[];
+extern uint8_t* receive_buffer[];
 extern hv_vmbus_service service_table[];
 
 void hv_kvp_callback(void *context);

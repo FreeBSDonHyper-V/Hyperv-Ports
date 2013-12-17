@@ -38,6 +38,7 @@
 #include <sys/reboot.h>
 #include <sys/timetc.h>
 #include <sys/syscallsubr.h>
+
 #include <hyperv.h>
 #include "hv_kvp.h"
 
@@ -93,26 +94,26 @@ hv_vmbus_service service_table[] = {
 	},
 };
 
-
-// 
-// Receive buffer pointers, there is one buffer per utility service. The
-// buffer is allocated during attach().
-//
-
-uint8_t* receive_buffer[HV_MAX_UTIL_SERVICES];
+/*
+ * Receive buffer pointers. There is one buffer per utility service. The
+ * buffer is allocated during attach().
+ */
+uint8_t *receive_buffer[HV_MAX_UTIL_SERVICES];
 
 struct hv_ictimesync_data {
 	uint64_t    parenttime;
 	uint64_t    childtime;
 	uint64_t    roundtriptime;
-       uint8_t     flags;
+	uint8_t     flags;
 } __packed;
 
-static int hv_timesync_init(hv_vmbus_service *serv)
+static int
+hv_timesync_init(hv_vmbus_service *serv)
 {
+
 	serv->work_queue = hv_work_queue_create("Time Sync");
 	if (serv->work_queue == NULL)
-	    return (ENOMEM);
+		return (ENOMEM);
 	return (0);
 }
 
@@ -167,12 +168,17 @@ hv_set_host_time(void *context)
 	
 	diff = (int64_t)host_ts.tv_sec - (int64_t)guest_ts.tv_sec;
 
-	// If host differs by 5 seconds then make the guest catch up
+	/*
+	 * If host differs by 5 seconds then make the guest catch up
+	 */
 	if (diff > 5 || diff < -5) {
-		error = kern_clock_settime( curthread, CLOCK_REALTIME, &host_ts );
+		error = kern_clock_settime(curthread, CLOCK_REALTIME,
+		    &host_ts);
 	} 
 
-	/* Free the hosttime that was allocated in hv_adj_guesttime() */	
+	/*
+	 * Free the hosttime that was allocated in hv_adj_guesttime()
+	 */
 	free(time_msg, M_DEVBUF);
 }
 
@@ -194,23 +200,19 @@ void hv_adj_guesttime(uint64_t hosttime, uint8_t flags)
 
 	time_msg = malloc(sizeof(time_sync_data), M_DEVBUF, M_NOWAIT);
 
-	if(time_msg == NULL)
-	   return;
+	if (time_msg == NULL)
+		return;
 	
 	time_msg->data = hosttime;
 
-		
 	if ((flags & HV_ICTIMESYNCFLAG_SYNC) != 0) {
-	    hv_queue_work_item(service_table[HV_TIME_SYNCH].work_queue,
-		hv_set_host_time, time_msg);
-	}
-	else if ((flags & HV_ICTIMESYNCFLAG_SAMPLE) != 0) {
-	    hv_queue_work_item(service_table[HV_TIME_SYNCH].work_queue,
-		hv_set_host_time, time_msg);
-	}
-	else {
-
-	    free(time_msg, M_DEVBUF);
+		hv_queue_work_item(service_table[HV_TIME_SYNCH].work_queue,
+		    hv_set_host_time, time_msg);
+	} else if ((flags & HV_ICTIMESYNCFLAG_SAMPLE) != 0) {
+		hv_queue_work_item(service_table[HV_TIME_SYNCH].work_queue,
+		    hv_set_host_time, time_msg);
+	} else {
+		free(time_msg, M_DEVBUF);
 	}
 }
 
