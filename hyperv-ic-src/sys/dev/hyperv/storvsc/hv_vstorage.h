@@ -108,7 +108,7 @@ struct vmscsi_req {
 	    uint8_t sense_data[SENSE_BUFFER_SIZE];
 
 	    uint8_t reserved_array[MAX_DATA_BUFFER_LENGTH_WITH_PADDING];
-	};
+	} u;
 
 } __packed;
 
@@ -192,7 +192,7 @@ struct vstor_packet {
 	     * Used during version negotiations.
 	     */
 	    struct vmstor_proto_ver version;
-	};
+	} u;
 
 } __packed;
 
