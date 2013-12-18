@@ -618,13 +618,15 @@ netvsc_recv(struct hv_device *device_ctx, netvsc_packet *packet)
 {
 	hn_softc_t *sc = (hn_softc_t *)device_get_softc(device_ctx->device);
 	struct mbuf *m_new;
-	struct ifnet *ifp = sc->hn_ifp;
+	struct ifnet *ifp;
 	int size;
 	int i;
 
 	if (sc == NULL) {
 		return (0); /* TODO: KYS how can this be! */
 	}
+
+	ifp = sc->hn_ifp;
 	
 	ifp = sc->arpcom.ac_ifp;
 
@@ -724,8 +726,8 @@ hn_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
 	netvsc_device_info device_info;
 	struct hv_device *hn_dev;
 	int mask, error = 0;
-	bool usable;
-
+	int retry_cnt = 500;
+	
 	switch(cmd) {
 
 	case SIOCSIFADDR:
@@ -746,25 +748,26 @@ hn_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
 
 		/* Obtain and record requested MTU */
 		ifp->if_mtu = ifr->ifr_mtu;
+ 		
+		do {
+			NV_LOCK(sc);
+			if (!sc->temp_unusable) {
+				sc->temp_unusable = TRUE;
+				retry_cnt = -1;
+			}
+			NV_UNLOCK(sc);
+			if (retry_cnt > 0) {
+				retry_cnt--;
+				DELAY(5 * 1000);
+			}
+		} while (retry_cnt > 0);
 
-		usable = false;
-                while (!usable)
-                {
-                        NV_LOCK(sc);
+		if (retry_cnt == 0) {
+			error = EINVAL;
+			break;
+		}
 
-                        if (!sc->temp_unusable) {
-                                usable = sc->temp_unusable = TRUE;
-                        }
-
-                        NV_UNLOCK(sc);
-
-                        if (!usable) {
-                                DELAY( 5 * 10000 ); 
-                        }
-                }
-
-		/*
-		 * We must remove and add back the device to cause the new
+		/* We must remove and add back the device to cause the new
 		 * MTU to take effect.  This includes tearing down, but not
 		 * deleting the channel, then bringing it back up.
 		 */
@@ -790,24 +793,23 @@ hn_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
 		NV_UNLOCK(sc);
 		break;
 	case SIOCSIFFLAGS:
-		usable = false;
-                while (!usable)
-                {
-                        NV_LOCK(sc);
+		do {
+                       NV_LOCK(sc);
+                       if (!sc->temp_unusable) {
+                               sc->temp_unusable = TRUE;
+                               retry_cnt = -1;
+                       }
+                       NV_UNLOCK(sc);
+                       if (retry_cnt > 0) {
+                      	        retry_cnt--;
+                        	DELAY(5 * 1000);
+                       }
+                } while (retry_cnt > 0);
 
-                        if (!sc->temp_unusable) {
-                                usable = sc->temp_unusable = TRUE;
-                        }
-
-                        NV_UNLOCK(sc);
-
-                        if (!usable) {
-                                DELAY( 5 * 10000 ); 
-                        }
+                if (retry_cnt == 0) {
+                       error = EINVAL;
+                       break;
                 }
-
-		sc->temp_unusable = TRUE;
-		NV_UNLOCK(sc);
 
 		if (ifp->if_flags & IFF_UP) {
 			/*

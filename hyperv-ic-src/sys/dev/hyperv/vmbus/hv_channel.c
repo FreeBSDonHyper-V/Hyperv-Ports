@@ -70,7 +70,7 @@ vmbus_channel_set_event(hv_vmbus_channel *channel)
 
 		synch_set_bit(channel->monitor_bit,
 			(uint32_t *)&monitor_page->
-				trigger_group[channel->monitor_group].pending);
+				trigger_group[channel->monitor_group].u.pending);
 	} else {
 		hv_vmbus_set_event(channel->offer_msg.child_rel_id);
 	}

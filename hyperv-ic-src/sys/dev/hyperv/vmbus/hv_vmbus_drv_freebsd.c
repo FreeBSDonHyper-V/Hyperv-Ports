@@ -113,7 +113,7 @@ vmbus_msg_swintr(void *dummy)
 	     */
 	    wmb();
 
-	    if (msg->header.message_flags.message_pending) {
+	    if (msg->header.message_flags.u.message_pending) {
 			/*
 			 * This will cause message queue rescan to possibly
 			 * deliver another msg from the hypervisor
@@ -293,7 +293,8 @@ hv_vmbus_child_device_unregister(struct hv_device *child_dev)
 	return(ret);
 }
 
-static void vmbus_identify(driver_t *driver, device_t parent) {
+static void 
+vmbus_identify(driver_t *driver, device_t parent) {
 	BUS_ADD_CHILD(parent, 0, "vmbus", 0);
 	if (device_find_child(parent, "vmbus", 0) == NULL) {
 		BUS_ADD_CHILD(parent, 0, "vmbus", 0);
@@ -340,8 +341,7 @@ vmbus_bus_init(void)
 		int io_bus:4;
 		uint32_t io_lowreg;
 	};
-
-	int ret;
+	int i, ret;
 	unsigned int vector = 0;
 	struct intsrc *isrc;
 	struct ioapic_intsrc *intpin;
@@ -420,14 +420,14 @@ vmbus_bus_init(void)
 	 * Notify the hypervisor of our irq.
 	 */
 	setup_args.vector = vector;
-	for(int i=0; i < 2; i++) {
-		setup_args.pageBuffers[i] =
+	for(i = 0; i < 2; i++) {
+		setup_args.page_buffers[i] =
 				malloc(PAGE_SIZE, M_DEVBUF, M_NOWAIT | M_ZERO);
-		if (setup_args.pageBuffers[i] == NULL) {
-			KASSERT(setup_args.pageBuffers[i] != NULL,
+		if (setup_args.page_buffers[i] == NULL) {
+			KASSERT(setup_args.page_buffers[i] != NULL,
 					("Error VMBUS: malloc failed!"));
 			if (i > 0)
-				free(setup_args.pageBuffers[0], M_DEVBUF);
+				free(setup_args.page_buffers[0], M_DEVBUF);
 			goto cleanup4;
 		}
 	}
@@ -492,8 +492,8 @@ vmbus_init(void)
 {
 	/* 
 	 * If the system has already booted and thread
-	 * scheduling is possible indicated by the global
-	 * cold set to zero, we just call the driver
+	 * scheduling is possible, as indicated by the
+	 * global cold set to zero, we just call the driver
 	 * initialization directly.
 	 */
 	if (!cold) 
@@ -503,14 +503,16 @@ vmbus_init(void)
 static void
 vmbus_bus_exit(void)
 {
+	int i;
+
 	hv_vmbus_release_unattached_channels();
 	hv_vmbus_disconnect();
 
 	smp_rendezvous(NULL, hv_vmbus_synic_cleanup, NULL, NULL);
 
-	for(int i=0; i < 2; i++) {
-		if(setup_args.pageBuffers[i] != 0)
-			free(setup_args.pageBuffers[i], M_DEVBUF);
+	for(i = 0; i < 2; i++) {
+		if (setup_args.page_buffers[i] != 0)
+			free(setup_args.page_buffers[i], M_DEVBUF);
 	}
 
 	hv_vmbus_cleanup();
