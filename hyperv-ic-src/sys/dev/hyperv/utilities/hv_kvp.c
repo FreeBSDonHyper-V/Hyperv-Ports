@@ -103,7 +103,7 @@ typedef struct hv_kvp_msg   hv_kvp_bsd_msg;
 static int hv_kvp_ready(void);
 static int hv_kvp_transaction_active(void);
 static void hv_kvp_transaction_init(uint32_t, hv_vmbus_channel *, uint64_t, uint8_t *);
-static void hv_kvp_conn_register();
+static void hv_kvp_conn_register(void);
 static void hv_kvp_process_msg(void *p);
 
 /*
@@ -870,7 +870,7 @@ Finish:
  * Initiate a connection and receive REGISTER message from the user daemon
  */
 static void
-hv_kvp_conn_register()
+hv_kvp_conn_register(void)
 {
 	int error = KVP_SUCCESS;
 
