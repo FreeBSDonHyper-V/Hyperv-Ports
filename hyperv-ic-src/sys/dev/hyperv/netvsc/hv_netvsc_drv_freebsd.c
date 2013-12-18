@@ -801,8 +801,8 @@ hn_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
                        }
                        NV_UNLOCK(sc);
                        if (retry_cnt > 0)
-                       		retry_cnt--;
-                       		DELAY(5 * 1000);
+                               retry_cnt--;
+                               DELAY(5 * 1000);
                        }
                 } while (retry_cnt > 0);
 
