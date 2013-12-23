@@ -10,6 +10,7 @@ COMMENT=	Hyper-V Integration Components
 
 FETCH_ARGS=	-Fpr
 
+CC=clang
 
 ONLY_FOR_ARCHS=	amd64 i386
 
