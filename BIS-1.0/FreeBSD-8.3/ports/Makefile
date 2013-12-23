@@ -3,7 +3,7 @@
 PORTNAME=	hyperv-ic
 PORTVERSION=	1.0
 CATEGORIES=	kld
-MASTER_SITES=	https://github.com/FreeBSDonHyper-V/Hyperv-Ports/raw/hyperv-ic-master/BIS-1.0/FreeBSD-9.1/ports/
+MASTER_SITES=	https://github.com/FreeBSDonHyper-V/Hyperv-Ports/raw/hyperv-ic-master/BIS-1.0/FreeBSD-8.3/ports/
 
 MAINTAINER=	bsdic@microsoft.com
 COMMENT=	Hyper-V Integration Components
