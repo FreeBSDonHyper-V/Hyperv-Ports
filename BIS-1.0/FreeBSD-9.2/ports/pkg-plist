@@ -1,0 +1,25 @@
+@cwd /boot/kernel
+hv_ata_pci_disengage.ko
+hv_netvsc.ko
+hv_storvsc.ko
+hv_utils.ko
+hv_vmbus.ko
+@cwd /usr/local/hyperv/scripts
+hv_get_dhcp_info
+hv_get_dns_info
+hv_set_ifconfig
+@cwd /etc/rc.d
+hv_kvpd
+@cwd /usr/sbin
+hv_kvp_daemon
+@cwd /usr/share/man/man1
+hyperv-ic.1.gz
+@cwd /usr/share/man/man4
+hv_ata_pci_disengage.4.gz
+hv_kvp.4.gz
+hv_netvsc.4.gz
+hv_storvsc.4.gz
+hv_utils.4.gz
+hv_vmbus.4.gz
+@cwd /usr/share/man/man8
+hv_kvp_daemon.8.gz
