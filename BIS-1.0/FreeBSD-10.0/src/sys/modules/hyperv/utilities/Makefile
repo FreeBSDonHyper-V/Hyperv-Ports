@@ -8,8 +8,7 @@ SRCS =  hv_kvp.c
 
 SRCS+=	device_if.h bus_if.h
 
-CFLAGS+= -I${.CURDIR}/../../../dev/hyperv/include \
-	 -I${.CURDIR}/../../../dev/hyperv/vmbus
+CFLAGS+= -I${.CURDIR}/../../../dev/hyperv/include
 
 #DEBUG_FLAGS+= -g
 
