@@ -1,0 +1,212 @@
+# This is a shell archive.  Save it in a file, remove anything before
+# this line, and then unpack it by entering "sh file".  Note, it may
+# create directories; files and directories will be owned by you and
+# have default permissions.
+#
+# This archive contains:
+#
+#	hv-kvp
+#	hv-kvp/distinfo
+#	hv-kvp/Makefile
+#	hv-kvp/pkg-deinstall
+#	hv-kvp/pkg-descr
+#	hv-kvp/pkg-install
+#	hv-kvp/pkg-plist
+#
+echo c - hv-kvp
+mkdir -p hv-kvp > /dev/null 2>&1
+echo x - hv-kvp/distinfo
+sed 's/^X//' >hv-kvp/distinfo << 'c52c1ab941bd30c4579949b25e0bdf64'
+XSHA256 (hv-kvp-1.0.tar.gz) = a53c9559b95ac5fb00fec8f020f2ff1aebcd043c72d0c673f5e84e02ddb56eed
+XSIZE (hv-kvp-1.0.tar.gz) = 31638
+c52c1ab941bd30c4579949b25e0bdf64
+echo x - hv-kvp/Makefile
+sed 's/^X//' >hv-kvp/Makefile << '894c0a565bee8d65dbee2cf15e32bbcf'
+X# $FreeBSD$
+X
+XPORTNAME=	hv-kvp
+XPORTVERSION=	1.0
+XCATEGORIES=	kld
+XMASTER_SITES=	https://github.com/FreeBSDonHyper-V/Hyperv-Ports/raw/hyperv-ic-master/BIS-1.0/FreeNAS-9.2.1/ports/
+X
+XMAINTAINER=	bsdic@microsoft.com
+XCOMMENT=	Hyper-V KVP Integration Components
+X
+XFETCH_ARGS=	-Fpr
+X
+XNO_STAGE = yes
+X
+XONLY_FOR_ARCHS=	amd64 i386
+X
+Xpre-install:
+X	@PKG_PREFIX=${PREFIX} ${SH} ${PKGINSTALL} ${PKGNAME} PRE-INSTALL
+X
+Xpost-install:
+X	@PKG_PREFIX=${PREFIX} ${SH} ${PKGINSTALL} ${PKGNAME} POST-INSTALL
+X
+Xpost-deinstall:
+X	@PKG_PREFIX=${PREFIX} ${SH} ${PKGDEINSTALL} ${PKGNAME} POST-DEINSTALL
+X
+X.include <bsd.port.mk>
+894c0a565bee8d65dbee2cf15e32bbcf
+echo x - hv-kvp/pkg-deinstall
+sed 's/^X//' >hv-kvp/pkg-deinstall << 'bf728edf334568accfce19338332be77'
+X#!/bin/sh
+X#
+X# make deinstall or pkd_delete script 
+X# cleans the hyperv labels
+X#
+X
+Xif [ "$2" = "DEINSTALL" ]; then
+X   test="/boot/loader.conf"
+X
+X   if [ -f $test ]; then
+X   echo "===> File $test exists"
+X   echo  "Removing Hyper-v drivers labels "
+X   # Deleting hyperv driver names
+X   sed -i".bak" '/Loader label for Hyper-V KVP driver/d' /boot/loader.conf
+X   sed -i".bak" '/hv_kvp_load/d' /boot/loader.conf
+X   else 
+X   echo "===> File $test not found"
+X   fi
+X
+Xecho "===> Removing kvp daemon label"
+Xsed -i".bak" '/Label for KVP daemon/d' /etc/rc.conf
+Xsed -i".bak" '/hv_kvp_daemon_enable/d' /etc/rc.conf
+X
+Xfi
+Xexit 0
+bf728edf334568accfce19338332be77
+echo x - hv-kvp/pkg-descr
+sed 's/^X//' >hv-kvp/pkg-descr << '046838091d012d3b5447b984b604dd4f'
+XNAME
+X     hv-kvp -- Hyper-V KVP Integration Components
+X
+XSYNOPSIS
+X     The hv-kvp provision a collection of kernel mode drivers and services
+X     that enhance FreeBSD guest experience on Hyper-V.
+X
+X
+XDESCRIPTION
+X     The Hyper-V Integration Components include drivers and services that
+X     improve functionality and performance of a FreeBSD guest operating system
+X     running on Hyper-V. As of this writing, the hv-kvp ports package
+X     installs the following binaries:
+X
+X     a) hv_utils.ko - This is a loadable kernel module that provides FreeBSD
+X     guests with timekeeping, heartbeat, console shutdown and key-value pair
+X     functionality. This module is located under /boot/kernel/.
+X
+X     b) hv_kvp_daemon - This is a user mode daemon that communicates with the
+X     hv_utils driver to manage user configurable metadata in the form of key
+X     value pairs.  This daemon also allows the system administrator to read
+X     and set IP addresses assigned to a FreeBSD guest. The daemon utilizes the
+X     following collection of scripts stored under /usr/local/hyperv/scripts:
+X     hv_get_dhcp_info
+X     hv_get_dns_info
+X     hv_set_ifconfig
+X
+X     The daemon is located under /usr/sbin/. The corresponding daemon script
+X     named hv_kvpd is present under /etc/rc.d/.
+X
+XPRE-REQUISITE
+X     Before you install hv-kvp ports, please ensure that you have added
+X     disk labels or UUIDs to all devices listed in fstab.
+X
+XSEE ALSO
+X     hv_kvp(4), hv_kvp_daemon(8)
+X
+XHISTORY
+X     Support for hv-kvp ports was first released in September 2013. The
+X     ports were developed through a joint effort between Citrix Inc.,
+X     Microsoft Corp. and Network Appliance Inc..
+X
+XAUTHORS
+X     FreeBSD support for hv-kvp was first added by Microsoft BSD
+X     Integration Services Team <bsdic@microsoft.com>.
+046838091d012d3b5447b984b604dd4f
+echo x - hv-kvp/pkg-install
+sed 's/^X//' >hv-kvp/pkg-install << '63f981134b7afc17f76a5f38125d463f'
+X#!/bin/sh
+X#
+X# make install or pkg_add script
+X# Checks labels/gptids for roots and swap partitions
+X# adds hyperv labels in loader.conf 
+X#
+X
+Xif [ "$2" = "PRE-INSTALL" ]; then
+Xecho "===> Pre-install Check"
+X# KVP - Directories Check
+X
+Xecho "===> Checking KVP directories" 
+Xkvp_dir="/usr/local/hyperv/"
+Xkvp_dir_scripts="/usr/local/hyperv/scripts"
+X
+Xif [ -d $kvp_dir ]; then
+X   if [ -d $kvp_dir_scripts ]; then
+X      echo " ### KVP Directories present " 
+X   else 
+X      echo " ### Creating $kvp_dir_scripts directory "
+X      mkdir /usr/local/hyperv/scripts
+X   fi
+Xelse 
+X   echo " xxx KVP directories not found"
+X   echo " ### Creating KVP  directories "
+X   mkdir /usr/local/hyperv
+X   mkdir /usr/local/hyperv/scripts
+Xfi
+X
+Xelse if [ "$2" = "POST-INSTALL" ]; then
+X   test="/boot/loader.conf"
+X
+X   if [ -f $test ]; then
+X      echo "===> File $test exists"
+X      echo "Adding for Hyper-v drivers"
+X
+X      # Deleting kvp label
+X      sed -i".bak" '/Loader label for Hyper-V KVP drivers/d' /etc/rc.conf
+X      sed -i".bak" '/hv_kvp_load/d' /etc/rc.conf
+X
+X
+X      #hyperv driver names
+X      echo  "# Loader label for Hyper-V KVP drivers -do not modify" >> /boot/loader.conf
+X      echo  "hv_kvp_load=\"YES\"" >> /boot/loader.conf
+X
+X   else
+X      echo "===> File $test does not exists"
+X      echo " Adding File $test and Hyper-V KVP driver labels"
+X      #hyperv kvp driver names
+X      echo  "# Loader labels for Hyper-V KVP drivers -do not modify" >> /boot/loader.conf
+X      echo  "hv_kvp_load=\"YES\"" >> /boot/loader.conf
+X   fi
+X
+X# KVP - daemon label
+Xecho "===> Adding kvp daemon label" 
+Xsed -i".bak" '/Label for KVP daemon/d' /etc/rc.conf
+Xsed -i".bak" '/hv_kvp_daemon_enable/d' /etc/rc.conf
+Xecho  "# Label for KVP daemon -do not modify" >> /etc/rc.conf
+Xecho  "hv_kvp_daemon_enable=\"YES\"" >> /etc/rc.conf
+X
+Xfi
+Xfi
+Xexit 0
+63f981134b7afc17f76a5f38125d463f
+echo x - hv-kvp/pkg-plist
+sed 's/^X//' >hv-kvp/pkg-plist << '1906612c73cb02fa4e9308669efadb84'
+X@cwd /boot/kernel
+Xhv_kvp.ko
+X@cwd /usr/local/hyperv/scripts
+Xhv_get_dhcp_info
+Xhv_get_dns_info
+Xhv_set_ifconfig
+X@cwd /etc/rc.d
+Xhv_kvpd
+X@cwd /usr/sbin
+Xhv_kvp_daemon
+X@cwd /usr/share/man/man4
+Xhv_kvp.4.gz
+X@cwd /usr/share/man/man8
+Xhv_kvp_daemon.8.gz
+1906612c73cb02fa4e9308669efadb84
+exit
+
