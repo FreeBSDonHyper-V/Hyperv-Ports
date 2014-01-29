@@ -261,7 +261,7 @@ struct hv_kvp_ip_msg {
 }
 __attribute__((packed));
 
-#define BSD_SOC_PATH                "/usr/local/hyperv/hyperv_socket"
+#define BSD_SOC_PATH                "/var/run/hyperv_socket"
 
 
 #define HV_WLTIMEDELTA              116444736000000000L     /* in 100ns unit */

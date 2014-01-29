@@ -6,8 +6,8 @@
 # This archive contains:
 #
 #	hv-kvp
-#	hv-kvp/distinfo
 #	hv-kvp/Makefile
+#	hv-kvp/distinfo
 #	hv-kvp/pkg-deinstall
 #	hv-kvp/pkg-descr
 #	hv-kvp/pkg-install
@@ -15,11 +15,6 @@
 #
 echo c - hv-kvp
 mkdir -p hv-kvp > /dev/null 2>&1
-echo x - hv-kvp/distinfo
-sed 's/^X//' >hv-kvp/distinfo << 'c52c1ab941bd30c4579949b25e0bdf64'
-XSHA256 (hv-kvp-1.0.tar.gz) = a53c9559b95ac5fb00fec8f020f2ff1aebcd043c72d0c673f5e84e02ddb56eed
-XSIZE (hv-kvp-1.0.tar.gz) = 31638
-c52c1ab941bd30c4579949b25e0bdf64
 echo x - hv-kvp/Makefile
 sed 's/^X//' >hv-kvp/Makefile << '894c0a565bee8d65dbee2cf15e32bbcf'
 X# $FreeBSD$
@@ -49,6 +44,11 @@ X	@PKG_PREFIX=${PREFIX} ${SH} ${PKGDEINSTALL} ${PKGNAME} POST-DEINSTALL
 X
 X.include <bsd.port.mk>
 894c0a565bee8d65dbee2cf15e32bbcf
+echo x - hv-kvp/distinfo
+sed 's/^X//' >hv-kvp/distinfo << 'c52c1ab941bd30c4579949b25e0bdf64'
+XSHA256 (hv-kvp-1.0.tar.gz) = 6d145f22300f6ae93a5ec84ee04d1ccce1b20d9930e43218210b972d10a949dc
+XSIZE (hv-kvp-1.0.tar.gz) = 31667
+c52c1ab941bd30c4579949b25e0bdf64
 echo x - hv-kvp/pkg-deinstall
 sed 's/^X//' >hv-kvp/pkg-deinstall << 'bf728edf334568accfce19338332be77'
 X#!/bin/sh

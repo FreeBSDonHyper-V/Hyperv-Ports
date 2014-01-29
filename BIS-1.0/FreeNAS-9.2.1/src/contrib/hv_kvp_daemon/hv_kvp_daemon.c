@@ -1311,7 +1311,7 @@ static int kvp_set_ip_info(char *if_name, struct hv_kvp_ipaddr_value *new_val)
 	/*
 	 * FreeBSD - Configuration File
 	 */
-	snprintf(if_file, sizeof(if_file), "%s%s", "/usr/local/hyperv/", "hv_set_ip_data");
+	snprintf(if_file, sizeof(if_file), "%s%s", "/var/run/", "hv_set_ip_data");
 	file = fopen(if_file, "w");
 
 	if (file == NULL) {
