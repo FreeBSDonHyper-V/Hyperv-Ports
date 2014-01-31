@@ -255,6 +255,15 @@ static int kvp_file_init(void)
 	int               i;
 	int               alloc_unit = sizeof(struct kvp_record) * ENTRIES_PER_BLOCK;
 
+	/* 
+	 * File System Read-Only Check
+	 */
+
+	if(access("/usr/local/hyperv", W_OK)) {
+		syslog(LOG_ERR, " Read-Only Permission on /usr/local/hyperv");
+		return (0);
+	}
+
 	if (access("/usr/local/hyperv/pool", F_OK)) {
 		if (mkdir("/usr/local/hyperv/pool", S_IRUSR | S_IWUSR | S_IROTH)) {
 			syslog(LOG_ERR, " Failed to create /usr/local/hyperv/pool");
