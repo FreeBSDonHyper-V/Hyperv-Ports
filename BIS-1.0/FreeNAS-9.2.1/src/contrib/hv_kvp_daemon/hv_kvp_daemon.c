@@ -260,7 +260,7 @@ static int kvp_file_init(void)
 	 */
 
 	if(access("/usr/local/hyperv", W_OK)) {
-		syslog(LOG_ERR, " Read-Only Permission on /usr/local/hyperv");
+		syslog(LOG_WARNING, " Read-Only Permission on /usr/local/hyperv");
 		return (0);
 	}
 
