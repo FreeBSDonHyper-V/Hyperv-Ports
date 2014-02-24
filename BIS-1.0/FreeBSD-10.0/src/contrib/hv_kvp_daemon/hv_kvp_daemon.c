@@ -667,11 +667,6 @@ static char *get_mac_address(const char *sdlstring)
  */
 static char *kvp_if_name_to_mac(char *if_name)
 {
-	FILE               *file;
-	char               *p, *x;
-	char               addr_file[256];
-	char               buf[256] = "\0";
-	int                i;
 	char               *mac_addr = NULL;
 	struct ifaddrs     *ifaddrs_ptr;
 	struct ifaddrs     *head_ifaddrs_ptr;
@@ -929,7 +924,7 @@ kvp_get_ip_info(int family, char *if_name, int op,
 	char                       cidr_mask[5]; /* /xyz */
 	int                        weight;
 	int                        i;
-	unsigned int               *w;
+	unsigned int		   *w = NULL;
 	char                       *sn_str;
 	struct sockaddr_in6        *addr6;
 
@@ -1016,7 +1011,7 @@ kvp_get_ip_info(int family, char *if_name, int op,
 				sn_str = (char *)ip_buffer->sub_net;
 				addr6  = (struct sockaddr_in6 *)
 				    curp->ifa_netmask;
-				//w = addr6->sin6_addr._S6_u32;
+				w = (unsigned int *)addr6->sin6_addr.s6_addr;
 
 				for (i = 0; i < 4; i++)
 				{
@@ -1062,91 +1057,6 @@ getaddr_done:
 	return (error);
 }
 
-
-static int expand_ipv6(char *addr, int type)
-{
-	int             ret;
-	struct in6_addr v6_addr;
-
-	ret = inet_pton(AF_INET6, addr, &v6_addr);
-
-	if (ret != 1) {
-		if (type == NETMASK) {
-			return (1);
-		}
-		return (0);
-	}
-
-	sprintf(addr, "%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:"
-	    "%02x%02x:%02x%02x:%02x%02x",
-	    (int)v6_addr.s6_addr[0], (int)v6_addr.s6_addr[1],
-	    (int)v6_addr.s6_addr[2], (int)v6_addr.s6_addr[3],
-	    (int)v6_addr.s6_addr[4], (int)v6_addr.s6_addr[5],
-	    (int)v6_addr.s6_addr[6], (int)v6_addr.s6_addr[7],
-	    (int)v6_addr.s6_addr[8], (int)v6_addr.s6_addr[9],
-	    (int)v6_addr.s6_addr[10], (int)v6_addr.s6_addr[11],
-	    (int)v6_addr.s6_addr[12], (int)v6_addr.s6_addr[13],
-	    (int)v6_addr.s6_addr[14], (int)v6_addr.s6_addr[15]);
-
-	return (1);
-}
-
-
-static int is_ipv4(char *addr)
-{
-	int            ret;
-	struct in_addr ipv4_addr;
-
-	ret = inet_pton(AF_INET, addr, &ipv4_addr);
-
-	if (ret == 1) {
-		return (1);
-	}
-	return (0);
-}
-
-
-static int parse_ip_val_buffer(char *in_buf, int *offset,
-    char *out_buf, int out_len)
-{
-	char *x;
-	char *start;
-
-	/*
-	 * in_buf has sequence of characters that are seperated by
-	 * the character ';'. The last sequence does not have the
-	 * terminating ";" character.
-	 */
-	start = in_buf + *offset;
-
-	x = strchr(start, ';');
-	if (x) {
-		*x = 0;
-	} else{
-		x = start + strlen(start);
-	}
-
-	if (strlen(start) != 0) {
-		int i = 0;
-
-		/*
-		 * Get rid of leading spaces.
-		 */
-		while (start[i] == ' ')
-		{
-			i++;
-		}
-
-		if ((x - start) <= out_len) {
-			strcpy(out_buf, (start + i));
-			*offset += (x - start) + 1;
-			return (1);
-		}
-	}
-	return (0);
-}
-
-
 static int kvp_write_file(FILE *f, char *s1, char *s2, char *s3)
 {
 	int ret;
@@ -1159,100 +1069,6 @@ static int kvp_write_file(FILE *f, char *s1, char *s2, char *s3)
 
 	return (0);
 }
-
-
-static int process_ip_string(FILE *f, char *ip_string, int type)
-{
-	int  error = 0;
-	char addr[INET6_ADDRSTRLEN];
-	int  i = 0;
-	int  j = 0;
-	char str[256];
-	char sub_str[10];
-	int  offset = 0;
-
-	memset(addr, 0, sizeof(addr));
-
-	while (parse_ip_val_buffer(ip_string, &offset, addr,
-	    (MAX_IP_ADDR_SIZE * 2)))
-	{
-		sub_str[0] = 0;
-		if (is_ipv4(addr)) {
-			switch (type)
-			{
-			case IPADDR:
-				snprintf(str, sizeof(str), "%s", "IPADDR");
-				break;
-
-			case NETMASK:
-				snprintf(str, sizeof(str), "%s", "NETMASK");
-				break;
-
-			case GATEWAY:
-				snprintf(str, sizeof(str), "%s", "GATEWAY");
-				break;
-
-			case DNS:
-				snprintf(str, sizeof(str), "%s", "DNS");
-				break;
-			}
-			if (i != 0) {
-				if (type != DNS) {
-					snprintf(sub_str, sizeof(sub_str),
-					    "_%d", i++);
-				} else {
-					snprintf(sub_str, sizeof(sub_str),
-					    "%d", ++i);
-				}
-			} else if (type == DNS) {
-				snprintf(sub_str, sizeof(sub_str), "%d", ++i);
-			}
-		} else if (expand_ipv6(addr, type)) {
-			switch (type)
-			{
-			case IPADDR:
-				snprintf(str, sizeof(str), "%s", "IPV6ADDR");
-				break;
-
-			case NETMASK:
-				snprintf(str, sizeof(str), "%s", "IPV6NETMASK");
-				break;
-
-			case GATEWAY:
-				snprintf(str, sizeof(str), "%s",
-				    "IPV6_DEFAULTGW");
-				break;
-
-			case DNS:
-				snprintf(str, sizeof(str), "%s", "DNS");
-				break;
-			}
-			if ((j != 0) || (type == DNS)) {
-				if (type != DNS) {
-					snprintf(sub_str, sizeof(sub_str),
-					    "_%d", j++);
-				} else {
-					snprintf(sub_str, sizeof(sub_str),
-					    "%d", ++i);
-				}
-			} else if (type == DNS) {
-				snprintf(sub_str, sizeof(sub_str),
-				    "%d", ++i);
-			}
-		} else {
-			return (HV_INVALIDARG);
-		}
-
-		error = kvp_write_file(f, str, sub_str, addr);
-		if (error) {
-			return (error);
-		}
-		memset(addr, 0, sizeof(addr));
-	}
-
-	return (0);
-}
-
 
 static int kvp_set_ip_info(char *if_name, struct hv_kvp_ipaddr_value *new_val)
 {
@@ -1428,18 +1244,15 @@ kvp_get_domain_name(char *buffer, int length)
 
 int main(void)
 {
-	int                        fd, len, sock_opt, cl;
+	int                        fd, len, cl;
 	int                        error;
 	struct hv_kvp_msg          *hv_msg;
-	struct hv_kvp_msg          *hv_msgk;
-	char                       *p;
 	char                       *key_value;
 	char                       *key_name;
 	int                        op;
 	int                        pool;
 	char                       *if_name;
 	struct hv_kvp_ipaddr_value *kvp_ip_val;
-	char                       cwd[1024];
 
 	daemon(1, 0);
 	openlog("KVP", 0, LOG_USER);
