@@ -13,7 +13,7 @@ hv_kvpd
 @cwd /usr/sbin 
 hv_kvp_daemon
 @cwd /usr/share/man/man1
-hyperv-ic.1.gz
+hyperv-is.1.gz
 @cwd /usr/share/man/man4
 hv_ata_pci_disengage.4.gz
 hv_kvp.4.gz
