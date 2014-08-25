@@ -9,8 +9,8 @@ if [ "$2" = "DEINSTALL" ]; then
 
    if [ -f $test ]; then
    echo "===> File $test exists"
-   echo  "Removing Hyper-v drivers labels "
-   # Deleting hyperv driver names
+   echo  "Removing Hyper-v BIS drivers labels "
+   # Deleting Hyper-v BIS driver names
    sed -i "" '/Loader labels for Hyper-V driver/d' /boot/loader.conf
    sed -i "" '/hv_vmbus_load/d' /boot/loader.conf
    sed -i "" '/hv_utils_load/d' /boot/loader.conf

@@ -7,7 +7,7 @@ CATEGORIES=	kld
 MASTER_SITES=	https://github.com/FreeBSDonHyper-V/Hyperv-Ports/raw/hyperv-is-master/BIS-1.1/FreeBSD-9.2/ports/
 
 MAINTAINER=	bsdic@microsoft.com
-COMMENT=	Hyper-V Integration Service 
+COMMENT=	FreeBSD Integration Service on Hyper-v  
 
 FETCH_ARGS=	-Fpr
 
