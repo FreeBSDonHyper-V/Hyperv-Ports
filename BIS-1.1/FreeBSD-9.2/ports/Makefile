@@ -1,10 +1,10 @@
 # $FreeBSD$
 USES+=uidfix
 #NO_STAGE="YES"
-PORTNAME=	hyperv-ic
-PORTVERSION=	1.0
+PORTNAME=	hyperv-is
+PORTVERSION=	1.1
 CATEGORIES=	kld
-MASTER_SITES=	https://github.com/FreeBSDonHyper-V/Hyperv-Ports/raw/hyperv-ic-master/BIS-1.0/FreeBSD-9.1/ports/
+MASTER_SITES=	https://github.com/FreeBSDonHyper-V/Hyperv-Ports/raw/hyperv-is-master/BIS-1.1/FreeBSD-9.2/ports/
 
 MAINTAINER=	bsdic@microsoft.com
 COMMENT=	Hyper-V Integration Service 
