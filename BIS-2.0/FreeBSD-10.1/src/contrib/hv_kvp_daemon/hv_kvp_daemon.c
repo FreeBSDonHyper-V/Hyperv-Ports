@@ -286,7 +286,7 @@ kvp_file_init(void)
 
 	if (mkdir("/var/db/hyperv/pool", S_IRUSR | S_IWUSR | S_IROTH) < 0 &&
 	    errno != EEXIST) {
-		KVP_LOG(LOG_ERR, " Failed to create /var/db/hyperv/pool\n");
+		KVP_LOG(LOG_ERR, " Failed to create /var/db/hyperv/pool,%d\n", errno);
 		exit(EXIT_FAILURE);
 	}
 
