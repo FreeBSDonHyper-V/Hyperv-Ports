@@ -1,0 +1,5 @@
+#!/bin/sh
+
+echo "===> After uninstalling, do the following step to restore loader.conf:"
+echo "     # /bin/sh unloader.sh"
+echo ""

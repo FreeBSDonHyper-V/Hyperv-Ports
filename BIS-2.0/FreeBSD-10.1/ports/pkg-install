@@ -17,7 +17,10 @@ if [ ! -d ${WRKDIRS} ]; then
    WRKDIRS=/
 fi
 
-version=`uname -r`
+rel=`uname -r`
+ver=${rel%-*}
+major=${ver%.*}
+minor=${ver#*.}
 
 if [ "$2" = "PRE-INSTALL" ]; then
     echo "===> Pre-install Check"
@@ -48,17 +51,28 @@ if [ "$2" = "PRE-INSTALL" ]; then
         echo "===> Labels/gptids Found"
         echo "===> Hyper-V BIS Installation Continues"
     else
-        if [ $version != "10.1-RELEASE" ]; then
+        if [ $major -lt 10 ]; then
            echo "version is $version"
            echo "===> Labels/gptids Not found"
            echo "===> Hyper-V BIS Installation Aborted"
            echo "===> Refer to Disk UUID section in README document"
            echo "===> Please refer the Prerequisites page and complete all steps" 
-           echo "WWW: https://github.com/FreeBSDonHyper-V/Hyperv-Ports/wiki/Prerequisites " 
+           echo "http://technet.microsoft.com/en-us/library/0c66f1c8-2606-43a3-b4cc-166acaaf2d2a#BKMK_UUID " 
            exit 1 
-        else
-           echo "it is OK"
         fi
+    fi
+    
+    kvp_dir="/var/db/hyperv/"
+    kvp_dir_scripts="/var/db/hyperv/scripts"
+    if [ -d $kvp_dir ]; then
+        if [ -d $kvp_dir_scripts ]; then
+            echo " KVP Directories present "
+        else
+            mkdir /var/db/hyperv/scripts
+        fi
+    else
+        mkdir /var/db/hyperv
+        mkdir /var/db/hyperv/scripts
     fi
 fi
 exit 0

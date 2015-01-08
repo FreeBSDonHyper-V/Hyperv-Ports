@@ -1,17 +1,11 @@
 # $FreeBSD: head/emulators/hyperv-is/Makefile 370396 2014-10-07 20:27:29Z marino $
 
 USES=		kmod uidfix
-.include <bsd.port.pre.mk>
 
 PORTNAME=	hyperv-is
-PORTVERSION=	1.1
-PORTREVISION=	2
+PORTVERSION=	2.0
 CATEGORIES=	emulators
-.if ${OSREL} ==	"10.1" 
-MASTER_SITES=	https://github.com/junfangV/hyperv-is-test/raw/master/ports/
-.else
 MASTER_SITES=	https://github.com/${MSLINK}/
-.endif
 DISTNAME=	${DNAME}
 
 MAINTAINER=	bsdic@microsoft.com
@@ -19,17 +13,18 @@ COMMENT=	FreeBSD Integration Service on Hyper-v
 
 ONLY_FOR_ARCHS=	amd64 i386
 
-.if ${OSREL} ==	"10.1" 
-KMODDIR = /boot/kernel/
-.endif
 
-#USES=		kmod uidfix
+USES=		kmod uidfix
 BIS=		${PORTVERSION}
 MSBASE=		FreeBSDonHyper-V/Hyperv-Ports/raw/hyperv-is-master
 MSLINK=		${MSBASE}/BIS-${BIS}/FreeBSD-${OSREL}/ports
 MAKE_ARGS=	BINDIR=${PREFIX}/sbin MANDIR=${PREFIX}/man/man
-PKGMESSAGE=	${FILESDIR}/${PMSG}
 
+.include <bsd.port.pre.mk>
+
+.if ${OPSYS} != FreeBSD
+IGNORE=		${OPSYS} not supported
+.endif
 
 FILE_84=	hyperv-is-8.4.${BIS}
 FILE_91=	hyperv-is-9.1.${BIS}
@@ -43,28 +38,20 @@ DNAME=		${FILE_${OSREL:S/.//}}
 IGNORE=	 needless to install on FreeBSD-${OSREL}  
 .endif
 
-.if ${OSREL} ==	"10.1" 
-PREFIX= /usr/
-.endif
-
-.if ${OPSYS} != FreeBSD
-IGNORE=		${OPSYS} not supported
-.endif
-
 .if ${OSREL} == "10.0"
 BIS=		1.0
 PLIST_SUB=	A="@comment " B="" C="@comment " 
-PMSG=		pkg-message.B
 .else
 .if ${OSREL} ==	"10.1" 
+PREFIX= /usr/
+KMODDIR = /boot/kernel/
 WRKSRC=		${WRKDIR}/hyperv-is-${PORTVERSION}
 PLIST_SUB=	A="@comment " B="@comment " C=""
-PMSG=		pkg-message.C
 .else
+PORTVERSION=	1.1
 CC=		gcc -w
 WRKSRC=		${WRKDIR}/hyperv-is-${PORTVERSION}
 PLIST_SUB=	C="@comment " B="@comment " A=""
-PMSG=		pkg-message.A
 .endif
 .endif
 
@@ -78,6 +65,7 @@ post-patch:
 
 pre-install:
 .if ${OSREL} ==	"10.1" 
+	@${ECHO_MSG} "hahahahahahahahahahahahah"
 	@${MKDIR} ${STAGEDIR}${PREFIX} \
 	     ${STAGEDIR}/var/db/hyperv/scripts
 .else
@@ -88,7 +76,7 @@ pre-install:
 
 post-install:
 .if ${OSREL} !=	"10.1" 
-	${RM} ${STAGEDIR}/boot/kernel/linker.hints
+	${RM} -f ${STAGEDIR}/boot/kernel/linker.hints
 	${MV} ${STAGEDIR}/etc/rc.d/* ${STAGEDIR}${PREFIX}/etc/rc.d
 .if ${PREFIX} != /usr/local
 	${MV} ${STAGEDIR}/usr/local/* ${STAGEDIR}${PREFIX}
